@@ -1,0 +1,485 @@
+<title>Jalan Ibadah</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Konsep: perjalanan matahari dari subuh ke malam sebagai penanda kemajuan tiga level.
+   Satu momen berani (langit dan matahari), sisanya tenang. */
+:root{
+  --bg:#EEF3F8; --surface:#FFFFFF; --surface-2:#E2EAF3; --ink:#12233A; --ink-soft:#4A5D76; --line:#C9D6E5;
+  --accent:#F0A12B; --accent-ink:#2A1C00;
+  --good:#17776B; --good-bg:#D9F0EB; --bad:#B13A2B; --bad-bg:#F9E1DC;
+  --dawn-a:#D7CFF0; --dawn-b:#FBD9B0; --dawn-ink:#12233A;
+  --day-a:#9CCDF0; --day-b:#E1F2FC; --day-ink:#12233A;
+  --dusk-a:#B9A6DE; --dusk-b:#F7BC98; --dusk-ink:#2A1730;
+  --night-a:#1A2750; --night-b:#3A4A82; --night-ink:#EEF2FF;
+  --f-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1829; --surface:#16253B; --surface-2:#1E3150; --ink:#E9F0F8; --ink-soft:#A7B8CE; --line:#2C4466;
+    --accent:#F5B34A; --accent-ink:#2A1C00;
+    --good:#5FD0BF; --good-bg:#123A3A; --bad:#FF9A8A; --bad-bg:#4A2326;
+    --dawn-a:#2E2A55; --dawn-b:#6B4A55; --dawn-ink:#F4EAF0;
+    --day-a:#17406A; --day-b:#2D6A94; --day-ink:#EAF4FF;
+    --dusk-a:#3A2A5C; --dusk-b:#8A4C5A; --dusk-ink:#FBEFF2;
+    --night-a:#0B1330; --night-b:#1B2A5A; --night-ink:#EEF2FF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1829; --surface:#16253B; --surface-2:#1E3150; --ink:#E9F0F8; --ink-soft:#A7B8CE; --line:#2C4466;
+  --accent:#F5B34A; --accent-ink:#2A1C00;
+  --good:#5FD0BF; --good-bg:#123A3A; --bad:#FF9A8A; --bad-bg:#4A2326;
+  --dawn-a:#2E2A55; --dawn-b:#6B4A55; --dawn-ink:#F4EAF0;
+  --day-a:#17406A; --day-b:#2D6A94; --day-ink:#EAF4FF;
+  --dusk-a:#3A2A5C; --dusk-b:#8A4C5A; --dusk-ink:#FBEFF2;
+  --night-a:#0B1330; --night-b:#1B2A5A; --night-ink:#EEF2FF;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font:400 15px/1.55 var(--f-body);
+  padding-block:18px 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.app{max-width:520px;margin:0 auto;display:grid;gap:14px}
+.app>*{min-width:0}
+h1,h2,p{margin:0}
+h1{font:700 46px/.95 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+h2{font:700 27px/1.1 var(--f-display);text-wrap:balance}
+h1:focus,h2:focus{outline:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.eyebrow,.kicker{font:500 11px/1.3 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft)}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.top .habit{display:grid;gap:7px;flex:1;min-width:0}
+.seg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:min(210px,100%)}
+.seg i{height:6px;border-radius:3px;background:var(--line)}
+.seg i.on{background:var(--accent)}
+.tally{display:flex;align-items:center;gap:6px;font:600 14px/1 var(--f-body);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tally svg{width:18px;height:18px}
+
+.sky{position:relative;border-radius:18px;overflow:hidden;color:var(--dawn-ink);
+  background:linear-gradient(180deg,var(--dawn-a),var(--dawn-b));transition:color .6s}
+.sky[data-stage="day"]{color:var(--day-ink);background:linear-gradient(180deg,var(--day-a),var(--day-b))}
+.sky[data-stage="dusk"]{color:var(--dusk-ink);background:linear-gradient(180deg,var(--dusk-a),var(--dusk-b))}
+.sky[data-stage="night"]{color:var(--night-ink);background:linear-gradient(180deg,var(--night-a),var(--night-b))}
+.sky svg{display:block;width:100%;height:auto}
+.sky-label{position:absolute;left:14px;top:12px;font:600 11px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase}
+.sun{transition:transform 1.1s cubic-bezier(.4,0,.2,1),opacity .7s}
+.sun .halo{fill:var(--accent);opacity:.3}
+.sun .core{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+.ground{fill:var(--bg)}
+.wp{fill:none;stroke:currentColor;stroke-width:1.5;stroke-opacity:.7}
+.wp.done{fill:var(--accent);stroke:var(--surface);stroke-opacity:1}
+.night-stars{opacity:0;transition:opacity 1s}
+.sky[data-stage="night"] .night-stars{opacity:.9}
+.night-stars circle{fill:currentColor}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:14px}
+.card>*{min-width:0}
+.head{display:grid;gap:4px}
+.lead{color:var(--ink-soft)}
+.meta{font-size:13px;color:var(--ink-soft)}
+.prompt{font:600 21px/1.3 var(--f-display);text-wrap:balance}
+.fact{min-height:3.3em;color:var(--ink-soft);font-size:14px}
+
+.habits{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.habits li{display:flex;gap:7px;align-items:center;padding:6px 11px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--ink-soft)}
+.habits li b{font:600 12px/1 var(--f-body);font-variant-numeric:tabular-nums}
+.habits li.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.btn{appearance:none;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px/1 var(--f-body);
+  padding:15px 22px;min-height:48px;border-radius:12px;cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.col{display:grid;gap:10px;align-content:start}
+.opts{display:grid;gap:10px}
+.opts.two{grid-template-columns:1fr 1fr}
+.choice{appearance:none;display:block;width:100%;text-align:left;padding:14px;min-height:54px;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font:500 15px/1.4 var(--f-body);border-radius:12px;cursor:pointer}
+.choice:hover:not(:disabled){border-color:var(--ink-soft)}
+.choice:disabled{cursor:default;color:var(--ink)}
+.choice.is-sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.choice.is-good{background:var(--good-bg);border-color:var(--good)}
+.choice.is-bad{background:var(--bad-bg);border-color:var(--bad)}
+.choice.is-dim{opacity:.55}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+
+.fb{border-radius:12px;padding:14px;background:var(--surface-2);display:grid;gap:4px}
+.fb.good strong{color:var(--good)}
+.fb.bad strong{color:var(--bad)}
+
+.star{width:28px;height:28px;fill:none;stroke:var(--ink-soft);stroke-width:1.5;stroke-linejoin:round}
+.star.on{fill:var(--accent);stroke:var(--accent)}
+.stars-row{display:inline-flex;gap:6px}
+.big .star{width:46px;height:46px}
+.score{font:700 56px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.score small{font:500 20px var(--f-body);color:var(--ink-soft)}
+.pledge{border:2px dashed var(--accent);border-radius:12px;padding:16px;background:var(--surface-2);display:grid;gap:4px}
+.pledge strong{font:600 18px/1.3 var(--f-display)}
+
+@media (max-width:380px){
+  h1{font-size:40px}
+  .opts.two{grid-template-columns:1fr}
+  .card{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="habit">
+      <span class="eyebrow">Kebiasaan 2 dari 7 &middot; Beribadah</span>
+      <div class="seg" role="img" aria-label="Kebiasaan kedua dari tujuh kebiasaan"><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="tally" id="tally" aria-label="Bintang terkumpul"></div>
+  </header>
+
+  <div class="sky" id="sky" data-stage="dawn" aria-hidden="true">
+    <span class="sky-label" id="skyLabel">Subuh</span>
+    <svg viewBox="0 0 320 130" focusable="false">
+      <g class="night-stars">
+        <circle cx="40" cy="30" r="1.6"/><circle cx="84" cy="52" r="1.2"/><circle cx="120" cy="22" r="1.5"/>
+        <circle cx="168" cy="40" r="1.1"/><circle cx="204" cy="20" r="1.7"/><circle cx="246" cy="48" r="1.3"/>
+        <circle cx="284" cy="26" r="1.5"/><circle cx="64" cy="80" r="1.1"/><circle cx="262" cy="82" r="1.2"/>
+      </g>
+      <path d="M20 110 A140 100 0 0 1 300 110" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/>
+      <g id="wps"></g>
+      <g id="sun" class="sun"><circle class="halo" r="20"/><circle class="core" r="11"/></g>
+      <rect class="ground" x="0" y="110" width="320" height="20"/>
+    </svg>
+  </div>
+
+  <main id="main"></main>
+  <div class="sr" id="live" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var main=document.getElementById('main');
+var sky=document.getElementById('sky');
+var skyLabel=document.getElementById('skyLabel');
+var sun=document.getElementById('sun');
+var wps=document.getElementById('wps');
+var tally=document.getElementById('tally');
+var live=document.getElementById('live');
+var BEST_KEY='jalan-ibadah-terbaik';
+
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+function pos(t){var a=Math.PI*(1-t);return {x:160+140*Math.cos(a),y:110-100*Math.sin(a)};}
+
+var WP=[0.12,0.5,0.88];
+var STAGE=['dawn','day','dusk'];
+var LABEL={dawn:'Subuh',day:'Siang',dusk:'Senja',night:'Malam'};
+var NAMES=['Rumah Ibadah','Pilih yang Tepat','Hormat atau Tidak?'];
+var HABITS=['Bangun Pagi','Beribadah','Berolahraga','Makan Sehat dan Bergizi','Gemar Belajar','Bermasyarakat','Tidur Cepat'];
+
+var PLACES=[
+  {k:'islam',place:'Masjid',rel:'Islam',fact:'Masjid adalah tempat umat Islam salat berjemaah dan belajar bersama.'},
+  {k:'kristen',place:'Gereja',rel:'Kristen dan Katolik',fact:'Di gereja, umat Kristen dan Katolik berdoa, bernyanyi, dan beribadah bersama.'},
+  {k:'hindu',place:'Pura',rel:'Hindu',fact:'Di pura, umat Hindu bersembahyang dan mempersembahkan canang.'},
+  {k:'buddha',place:'Vihara',rel:'Buddha',fact:'Di vihara, umat Buddha bermeditasi dan membaca paritta.'},
+  {k:'konghucu',place:'Klenteng',rel:'Konghucu',fact:'Di klenteng, umat Konghucu bersembahyang dan menghormati leluhur.'}
+];
+
+var Q2=[
+  {q:'Waktu ibadah sudah tiba, tetapi kamu masih seru bermain gim. Apa yang kamu lakukan?',
+   opts:[{t:'Berhenti sebentar dan beribadah dulu',ok:1},{t:'Menunda sampai gimnya selesai',ok:0},{t:'Pura-pura tidak tahu waktunya',ok:0}],
+   why:'Beribadah pada waktunya melatih disiplin. Gimnya bisa dilanjutkan setelah selesai.'},
+  {q:'Kamu sedang dalam perjalanan jauh dan waktu ibadah tiba. Sebaiknya bagaimana?',
+   opts:[{t:'Bertanya kepada orang tua atau guru agama tentang cara beribadah saat bepergian',ok:1},{t:'Melewatkannya karena sedang di jalan',ok:0},{t:'Menunggu sampai tiba di rumah, berapa pun lamanya',ok:0}],
+   why:'Setiap agama punya tuntunan untuk situasi seperti ini. Bertanya adalah langkah yang baik.'},
+  {q:'Temanmu yang berbeda agama sedang beribadah saat kamu bermain ke rumahnya.',
+   opts:[{t:'Menunggu dengan tenang sampai ia selesai',ok:1},{t:'Memanggilnya keras-keras agar cepat selesai',ok:0},{t:'Menertawakan cara ibadahnya',ok:0}],
+   why:'Memberi ruang dan menjaga ketenangan adalah wujud saling menghormati.'},
+  {q:'Hari ini kamu merasa malas beribadah. Langkah terbaik apa?',
+   opts:[{t:'Mulai dari hal kecil, lalu ajak keluarga beribadah bersama',ok:1},{t:'Menunggu sampai rasa malas hilang sendiri',ok:0},{t:'Berhenti beribadah sepenuhnya',ok:0}],
+   why:'Kebiasaan tumbuh dari langkah kecil yang diulang setiap hari, dan dukungan keluarga sangat membantu.'},
+  {q:'Bagaimana cara membuat ibadahmu lebih bermakna?',
+   opts:[{t:'Menjalankannya dengan tenang dan sungguh-sungguh, gawai disimpan dulu',ok:1},{t:'Beribadah sambil bermain ponsel agar tidak bosan',ok:0},{t:'Melakukannya secepat mungkin supaya cepat selesai',ok:0}],
+   why:'Fokus dan ketenangan membuat ibadah terasa lebih bermakna.'}
+];
+
+function yn(a){return [{t:'Menghormati',ok:a?1:0},{t:'Tidak menghormati',ok:a?0:1}];}
+var Q3=[
+  {q:'Mengucapkan selamat hari raya kepada teman yang merayakannya.',fixed:1,opts:yn(true),why:'Ucapan sederhana membuat teman merasa dihargai.'},
+  {q:'Menertawakan cara temanmu berdoa.',fixed:1,opts:yn(false),why:'Cara beribadah adalah hal yang sangat berharga bagi setiap orang. Tidak pantas ditertawakan.'},
+  {q:'Menjaga suasana tetap tenang saat tetangga sedang beribadah.',fixed:1,opts:yn(true),why:'Ketenangan membantu orang lain beribadah dengan nyaman.'},
+  {q:'Memaksa teman berbeda agama untuk ikut beribadah dengan caramu.',fixed:1,opts:yn(false),why:'Setiap orang berhak memilih dan menjalankan keyakinannya sendiri.'},
+  {q:'Memberi temanmu waktu dan tempat untuk beribadah saat kerja kelompok.',fixed:1,opts:yn(true),why:'Memberi kesempatan beribadah menunjukkan bahwa kamu menghargai temanmu.'},
+  {q:'Mengejek rumah ibadah agama lain.',fixed:1,opts:yn(false),why:'Rumah ibadah adalah tempat suci bagi pemeluknya. Semua orang patut menghormatinya.'}
+];
+
+var COMMITS=[
+  'Beribadah tepat waktu',
+  'Beribadah atau berdoa bersama keluarga',
+  'Menjaga ketenangan saat orang lain beribadah',
+  'Mengucapkan selamat hari raya kepada teman'
+];
+
+var state={screen:'intro',lvl:0,stars:[0,0,0],commit:-1,total:0,best:null};
+var g={};
+
+function starsHTML(n,max){
+  max=max||3;
+  var h='<span class="stars-row" role="img" aria-label="'+n+' dari '+max+' bintang">';
+  for(var i=0;i<max;i++){
+    h+='<svg viewBox="0 0 24 24" class="star'+(i<n?' on':'')+'" aria-hidden="true"><polygon points="12,2 15,9 22,9.5 16.5,14.5 18.5,22 12,17.5 5.5,22 7.5,14.5 2,9.5 9,9"/></svg>';
+  }
+  return h+'</span>';
+}
+function totalStars(){return state.stars[0]+state.stars[1]+state.stars[2];}
+function say(t){live.textContent='';setTimeout(function(){live.textContent=t;},30);}
+
+/* ---------- Layar ---------- */
+function introHTML(){
+  var li=HABITS.map(function(h,i){return '<li'+(i===1?' class="on"':'')+'><b>'+(i+1)+'</b>'+h+'</li>';}).join('');
+  return '<section class="card">'
+    +'<div class="head"><p class="kicker">7 Kebiasaan Anak Indonesia Hebat</p><h1>Jalan Ibadah</h1></div>'
+    +'<p class="lead">Ikuti perjalanan matahari dari subuh sampai malam. Di tiga level, kamu belajar beribadah sesuai agama dan kepercayaanmu, dan menghormati ibadah orang lain.</p>'
+    +'<ol class="habits" aria-label="Tujuh kebiasaan">'+li+'</ol>'
+    +'<div class="foot"><span class="meta">3 level &middot; sekitar 3 menit</span><button type="button" class="btn" data-act="start">Mulai bermain</button></div>'
+    +'</section>';
+}
+
+function l1HTML(){
+  var d=g, n=Object.keys(d.done).length;
+  function btn(side,o){
+    var key=o.k, isDone=!!d.done[key], cls='choice';
+    if(isDone) cls+=' is-good';
+    else if(side==='L'&&d.sel===key) cls+=' is-sel';
+    if(d.wrong&&!isDone&&((side==='L'&&d.wrong[0]===key)||(side==='R'&&d.wrong[1]===key))) cls+=' is-bad shake';
+    return '<button type="button" id="'+side+key+'" class="'+cls+'" data-act="'+(side==='L'?'pickL':'pickR')+'" data-v="'+key+'"'+(isDone?' disabled':'')+'>'+(side==='L'?o.place:o.rel)+'</button>';
+  }
+  var left=d.left.map(function(o){return btn('L',o);}).join('');
+  var right=d.right.map(function(o){return btn('R',o);}).join('');
+  var all=n===PLACES.length;
+  return '<section class="card">'
+    +'<div class="head"><p class="kicker">Level 1 dari 3</p><h2>'+NAMES[0]+'</h2></div>'
+    +'<p class="lead">Pasangkan tempat ibadah dengan umat yang beribadah di sana. Ketuk satu di kiri, lalu satu di kanan.</p>'
+    +'<div class="pair"><div class="col" role="group" aria-label="Tempat ibadah">'+left+'</div><div class="col" role="group" aria-label="Umat">'+right+'</div></div>'
+    +'<p class="fact">'+(d.fact||'')+'</p>'
+    +'<div class="foot"><span class="meta">Terpasang '+n+' dari '+PLACES.length+'</span>'
+    +(all?'<button type="button" class="btn" data-act="finish1" data-focus>Selesai level</button>':'')
+    +'</div></section>';
+}
+
+function quizHTML(){
+  var d=g, it=d.items[d.idx], n=d.items.length, ans=d.picked>=0, l3=state.lvl===2;
+  var opts=it.opts.map(function(o,i){
+    var cls='choice';
+    if(ans){ if(o.ok) cls+=' is-good'; else if(i===d.picked) cls+=' is-bad'; else cls+=' is-dim'; }
+    return '<button type="button" id="o'+i+'" class="'+cls+'" data-act="answer" data-v="'+i+'"'+(ans?' disabled':'')+'>'+o.t+'</button>';
+  }).join('');
+  var fb='';
+  if(ans){
+    var ok=it.opts[d.picked].ok, last=d.idx===n-1;
+    fb='<div class="fb '+(ok?'good':'bad')+'"><strong>'+(ok?'Tepat!':'Belum tepat.')+'</strong><span>'+it.why+'</span></div>'
+      +'<div class="foot"><span></span><button type="button" class="btn" data-act="advance" data-focus>'+(last?'Selesai level':'Lanjut')+'</button></div>';
+  }
+  var pct=Math.round((d.idx+(ans?1:0))/n*100);
+  return '<section class="card">'
+    +'<div class="head"><p class="kicker">Level '+(state.lvl+1)+' dari 3</p><h2>'+NAMES[state.lvl]+'</h2></div>'
+    +'<div><span class="meta">'+(l3?'Pernyataan ':'Soal ')+(d.idx+1)+' dari '+n+'</span><div class="bar"><i style="width:'+pct+'%"></i></div></div>'
+    +(l3?'<p class="lead">Apakah sikap ini menghormati ibadah orang lain?</p>':'')
+    +'<p class="prompt">'+it.q+'</p>'
+    +'<div class="opts'+(l3?' two':'')+'">'+opts+'</div>'+fb+'</section>';
+}
+
+function betweenHTML(){
+  var i=state.lvl, s=state.stars[i], last=i===2;
+  var msg=s===3?'Sempurna!':(s===2?'Bagus sekali!':'Terus berlatih, ya!');
+  return '<section class="card">'
+    +'<div class="head"><p class="kicker">Level '+(i+1)+' selesai</p><h2>'+msg+'</h2></div>'
+    +'<div class="big">'+starsHTML(s)+'</div>'
+    +'<p class="lead">'+NAMES[i]+' selesai. Matahari melanjutkan perjalanan.</p>'
+    +'<div class="foot"><span></span><button type="button" class="btn" data-act="goNext" data-focus>'+(last?'Lihat hasil':'Lanjut ke level '+(i+2))+'</button></div>'
+    +'</section>';
+}
+
+function resultHTML(){
+  var t=state.total;
+  var title=t>=8?'Luar biasa!':(t>=5?'Bagus sekali!':'Terus berlatih!');
+  var note=t>=8?'Kamu memahami makna beribadah dan cara menghormati ibadah orang lain.':(t>=5?'Kamu sudah paham dasarnya. Coba lagi untuk mendapat bintang penuh.':'Ibadah adalah kebiasaan yang tumbuh pelan-pelan. Coba main lagi, ya.');
+  var chips=COMMITS.map(function(c,i){
+    return '<button type="button" id="c'+i+'" role="radio" aria-checked="'+(state.commit===i)+'" class="choice'+(state.commit===i?' is-sel':'')+'" data-act="commit" data-v="'+i+'">'+c+'</button>';
+  }).join('');
+  var pledge=state.commit>=0?'<div class="pledge"><span class="eyebrow">Komitmen ibadahku</span><strong>'+COMMITS[state.commit]+'</strong><span class="meta">Ceritakan komitmen ini kepada orang tua atau gurumu.</span></div>':'';
+  var best=state.best!==null?'<span class="meta">Skor terbaik di perangkat ini: '+state.best+' dari 9</span>':'<span></span>';
+  return '<section class="card">'
+    +'<div class="head"><p class="kicker">Perjalanan selesai</p><h2>'+title+'</h2></div>'
+    +'<div class="score">'+t+'<small> / 9 bintang</small></div>'
+    +'<div class="big">'+starsHTML(Math.round(t/3),3)+'</div>'
+    +'<p class="lead">'+note+'</p>'
+    +'<div class="head"><p class="kicker">Pilih satu komitmen untuk hari ini</p></div>'
+    +'<div class="opts" role="radiogroup" aria-label="Komitmen ibadah">'+chips+'</div>'
+    +pledge
+    +'<div class="foot">'+best+'<button type="button" class="btn ghost" data-act="restart">Main lagi</button></div>'
+    +'</section>';
+}
+
+/* ---------- Langit dan penanda ---------- */
+function skyState(){
+  var s=state.screen;
+  if(s==='intro') return {stage:'dawn',t:0.03};
+  if(s==='result') return {stage:'night',t:1};
+  return {stage:STAGE[state.lvl],t:WP[state.lvl]};
+}
+function updateSky(){
+  var k=skyState();
+  sky.setAttribute('data-stage',k.stage);
+  skyLabel.textContent=LABEL[k.stage];
+  var p=pos(k.t);
+  sun.style.transform='translate('+p.x.toFixed(1)+'px,'+p.y.toFixed(1)+'px)';
+  sun.style.opacity=k.stage==='night'?'0':'1';
+  var c=wps.children;
+  for(var i=0;i<c.length;i++) c[i].setAttribute('class','wp'+(state.stars[i]>0?' done':''));
+}
+function updateTally(){
+  tally.innerHTML='<svg viewBox="0 0 24 24" class="star on" aria-hidden="true"><polygon points="12,2 15,9 22,9.5 16.5,14.5 18.5,22 12,17.5 5.5,22 7.5,14.5 2,9.5 9,9"/></svg>'+totalStars()+'/9';
+}
+
+/* ---------- Render ---------- */
+function render(focusHeading){
+  var ae=document.activeElement, keepId=ae&&ae.id&&main.contains(ae)?ae.id:null;
+  var s=state.screen;
+  main.innerHTML=s==='intro'?introHTML():s==='l1'?l1HTML():(s==='l2'||s==='l3')?quizHTML():s==='between'?betweenHTML():resultHTML();
+  updateSky();updateTally();
+  var f=main.querySelector('[data-focus]');
+  if(focusHeading){
+    var h=main.querySelector('h1,h2');
+    if(h){h.setAttribute('tabindex','-1');h.focus();}
+    window.scrollTo(0,0);
+  }else if(f){
+    f.focus({preventScroll:true});
+  }else if(keepId){
+    var el=document.getElementById(keepId);
+    if(el&&!el.disabled) el.focus({preventScroll:true});
+  }
+}
+
+/* ---------- Alur ---------- */
+function setupLevel(i){
+  state.lvl=i; state.screen='l'+(i+1);
+  if(i===0){
+    var left=shuffle(PLACES.slice()), right;
+    do{right=shuffle(PLACES.slice());}while(right.every(function(r,j){return r.k===left[j].k;}));
+    g={left:left,right:right,sel:null,done:{},mistakes:0,wrong:null,fact:''};
+  }else{
+    var data=i===1?Q2:Q3;
+    var items=shuffle(data.slice()).map(function(it){
+      return {q:it.q,why:it.why,opts:it.fixed?it.opts.slice():shuffle(it.opts.slice())};
+    });
+    g={items:items,idx:0,picked:-1,right:0};
+  }
+}
+function startLevel(i){setupLevel(i);render(true);}
+function finishLevel(i,stars){state.stars[i]=stars;state.lvl=i;state.screen='between';render(true);}
+function goResult(){
+  state.screen='result';
+  state.total=totalStars();
+  var prev=null;
+  try{var v=localStorage.getItem(BEST_KEY);if(v!==null)prev=parseInt(v,10);}catch(e){}
+  if(prev===null||isNaN(prev)||state.total>prev){
+    prev=state.total;
+    try{localStorage.setItem(BEST_KEY,String(prev));}catch(e){}
+  }
+  state.best=prev;
+  render(true);
+}
+
+var handlers={
+  start:function(){startLevel(0);},
+  pickL:function(k){g.wrong=null;g.sel=(g.sel===k)?null:k;render();},
+  pickR:function(k){
+    if(!g.sel){g.wrong=null;g.fact='Pilih dulu tempat ibadah di kolom kiri.';render();return;}
+    if(g.sel===k){
+      g.done[k]=true;g.sel=null;g.wrong=null;
+      var o=PLACES.filter(function(p){return p.k===k;})[0];
+      g.fact=o.fact;say('Cocok. '+o.fact);
+    }else{
+      g.mistakes++;g.wrong=[g.sel,k];g.sel=null;g.fact='Belum cocok. Coba lagi.';say('Belum cocok. Coba lagi.');
+    }
+    render();
+  },
+  finish1:function(){
+    var m=g.mistakes;
+    finishLevel(0,m<=1?3:(m<=3?2:1));
+  },
+  answer:function(i){
+    if(g.picked>=0)return;
+    i=parseInt(i,10);g.picked=i;
+    var it=g.items[g.idx],ok=it.opts[i].ok;
+    if(ok)g.right++;
+    say((ok?'Tepat! ':'Belum tepat. ')+it.why);
+    render();
+  },
+  advance:function(){
+    if(g.idx+1<g.items.length){g.idx++;g.picked=-1;render();return;}
+    var r=g.right,i=state.lvl;
+    var hi=i===1?5:6, mid=i===1?3:4;
+    finishLevel(i,r>=hi?3:(r>=mid?2:1));
+  },
+  goNext:function(){if(state.lvl<2)startLevel(state.lvl+1);else goResult();},
+  commit:function(i){state.commit=parseInt(i,10);render();},
+  restart:function(){state.stars=[0,0,0];state.commit=-1;state.lvl=0;state.screen='intro';render(true);}
+};
+
+main.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');
+  if(!t||t.disabled)return;
+  var fn=handlers[t.getAttribute('data-act')];
+  if(fn)fn(t.getAttribute('data-v'));
+});
+
+/* ---------- Pembuatan penanda dan mulai ---------- */
+WP.forEach(function(t){
+  var p=pos(t),c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx',p.x.toFixed(1));c.setAttribute('cy',p.y.toFixed(1));c.setAttribute('r','4.5');c.setAttribute('class','wp');
+  wps.appendChild(c);
+});
+
+var hot=window.claude&&window.claude.hot;
+if(hot&&hot.snapshot){
+  try{hot.snapshot(function(){return {screen:state.screen,lvl:state.lvl,stars:state.stars,commit:state.commit};});}catch(e){}
+}
+function boot(data){
+  data=data||{};
+  if(data.stars&&data.stars.length===3)state.stars=data.stars.map(function(n){return n|0;});
+  if(typeof data.commit==='number')state.commit=data.commit;
+  var s=data.screen;
+  if(s==='l1'||s==='l2'||s==='l3')setupLevel(parseInt(s.charAt(1),10)-1);
+  else if(s==='between'){state.lvl=data.lvl|0;state.screen='between';}
+  else if(s==='result'){state.total=totalStars();try{var v=parseInt(localStorage.getItem(BEST_KEY),10);state.best=isNaN(v)?state.total:v;}catch(e){state.best=state.total;}state.screen='result';}
+  sun.style.transition='none';
+  render(false);
+  void sun.getBoundingClientRect();
+  sun.style.transition='';
+}
+if(hot&&hot.ready)hot.ready(boot);else boot(hot&&hot.data);
+})();
+</script>
